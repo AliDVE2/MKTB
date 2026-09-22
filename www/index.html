@@ -234,7 +234,7 @@ const FIREBASE_CONFIG = {
 
 const state = { cats:[], products:[], settings:{managerPhone:DEFAULT_MANAGER, address:"", about:""},
                 view:"home", cat:"all", q:"", isAdmin:false, tab:"cats" };
-let db=null, auth=null, cloud=false;
+let auth=null, cloud=false;
 
 /* ---------- أدوات ---------- */
 const $ = s=>document.querySelector(s);
@@ -549,14 +549,25 @@ async function saveSet(){
   await dbSaveSettings({managerPhone:m,address:$("#sAddr").value.trim()}); toast("تم الحفظ ✅");
 }
 
-/* ---------- PWA بسيط (يشتغل كتطبيق على الموبايل) ---------- */
+/* ------------ PWA (يشغل كتطبيق) ------------ */
 (function(){
-  const manifest={name:SHOP_NAME,short_name:SHOP_NAME,start_url:".",display:"standalone",background_color:"#FF7A00",theme_color:"#FF7A00",lang:"ar",dir:"rtl",
-    icons:[{src:"data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#FF7A00"/><rect x="40" y="40" width="432" height="432" rx="90" fill="#141414"/><text x="256" y="350" font-size="300" font-weight="900" text-anchor="middle" fill="#FF7A00" font-family="Arial">م</text></svg>'),sizes:"512x512",type:"image/svg+xml"}]};
-  try{const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"}));document.head.appendChild(l)}catch(e){}
+  try {
+    const manifest = {
+      name: "مكتب المهندس",
+      short_name: "المهندس",
+      start_url: ".",
+      display: "standalone",
+      background_color: "#FF7A00",
+      theme_color: "#FF7A00",
+      lang: "ar",
+      dir: "rtl"
+    };
+    const l = document.createElement("link");
+    l.rel = "manifest";
+    l.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: "application/manifest+json"}));
+    document.head.appendChild(l);
+  } catch(e) {}
 })();
-// نهاية دالة الـ PWA
-  })();
 
 /* ---------- ربط السيرفر أونلاين (Firebase Firestore) ---------- */
 
