@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <!-- مكتبات Firebase السحابية -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBtpK7GC4VkFU1Ck0v6eC99KC-KjCsn75Y",
+    authDomain: "almhnds-67fdb.firebaseapp.com",
+    projectId: "almhnds-67fdb",
+    storageBucket: "almhnds-67fdb.firebasestorage.app",
+    messagingSenderId: "115142147135",
+    appId: "1:115142147135:web:27b27bd08a5b5f59434c8a"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FF7A00">
+<title>مكتب المهندس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --orange:#FF7A00;
+  --orange-d:#E86A00;
+  --orange-l:#FFE3C7;
+  --paper:#FFF4E6;
+  --ink:#141414;
+  --white:#fff;
+  --green:#1FA855;
+  --red:#D62828;
+  --bw:3px;
+  --shadow:5px 5px 0 var(--ink);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Tajawal',sans-serif;background:var(--paper);color:var(--ink);
+  min-height:100vh;padding-bottom:calc(84px + env(safe-area-inset-bottom));
+  background-image:radial-gradient(var(--orange-l) 1.5px,transparent 1.5px);background-size:22px 22px;
+}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:16px}
+:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
+
+/* ---------- Header ---------- */
+.top{
+  background:var(--orange);border-bottom:var(--bw) solid var(--ink);
+  padding:calc(14px + env(safe-area-inset-top)) 16px 16px;position:sticky;top:0;z-index:20;
+}
+.brand{display:flex;align-items:center;gap:12px;max-width:1100px;margin:auto}
+.logo{
+  width:54px;height:54px;flex:none;background:var(--ink);color:var(--orange);
+  border:var(--bw) solid var(--ink);border-radius:14px;display:grid;place-items:center;
+  overflow:hidden;box-shadow:3px 3px 0 var(--white);
+}
+.logo img{width:100%;height:100%;display:block}
+.brand h1{margin:0;font-family:'Cairo';font-weight:900;font-size:clamp(24px,6vw,34px);line-height:1.1;color:var(--ink)}
+.brand small{display:block;font-weight:700;font-size:13px;color:var(--ink);opacity:.8}
+.sync{margin-inline-start:auto;font-size:12px;font-weight:800;background:var(--white);border:2px solid var(--ink);
+  border-radius:99px;padding:3px 10px;white-space:nowrap}
+.sync i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-inline-end:5px}
+.sync.off i{background:#999}
+
+.wrap{max-width:1100px;margin:auto;padding:16px}
+.search{
+  display:flex;gap:8px;align-items:center;background:var(--white);border:var(--bw) solid var(--ink);
+  border-radius:14px;padding:4px 12px;box-shadow:var(--shadow);margin-bottom:16px
+}
+.search input{flex:1;border:0;outline:0;padding:11px 4px;background:transparent;min-width:0}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:none;background:var(--white);border:var(--bw) solid var(--ink);border-radius:99px;
+  padding:8px 18px;font-weight:800;font-size:15px;color:var(--ink)
+}
+.chip.on{background:var(--ink);color:var(--orange)}
+
+/* ---------- Products ---------- */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr);gap:18px}}
+@media(min-width:960px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{
+  background:var(--white);border:var(--bw) solid var(--ink);border-radius:18px;overflow:hidden;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;
+  transition:transform .12s, box-shadow .12s;cursor:pointer
+}
+.card:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+.card .pic{aspect-ratio:1/1;background:var(--orange-l);border-bottom:var(--bw) solid var(--ink);display:grid;place-items:center;overflow:hidden}
+.card .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.card .pic .ph{font-size:54px}
+.card .info{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{margin:0;font-size:16px;font-weight:800;line-height:1.35;min-height:2.7em}
+.price{font-family:'Cairo';font-weight:900;font-size:19px;color:var(--orange-d)}
+.price small{font-size:12px;color:var(--ink);font-weight:700}
+.tag{position:absolute;top:8px;inset-inline-start:8px;background:var(--ink);color:var(--white);font-size:12px;font-weight:800;padding:3px 10px;border-radius:99px}
+.btn{
+  border:var(--bw) solid var(--ink);border-radius:12px;padding:10px 14px;font-weight:800;font-size:15px;
+  background:var(--orange);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:3px 3px 0 var(--ink);text-decoration:none;transition:transform .1s, box-shadow .1s
+}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.wa{background:#25D366}
+.btn.dark{background:var(--ink);color:var(--orange);box-shadow:3px 3px 0 var(--orange)}
+.btn.white{background:var(--white)}
+.btn.red{background:var(--red);color:#fff}
+.btn.block{width:100%}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:10px;box-shadow:2px 2px 0 var(--ink)}
+.empty{text-align:center;padding:50px 20px;border:var(--bw) dashed var(--ink);border-radius:18px;background:var(--white);font-weight:700}
+.empty b{display:block;font-size:44px;margin-bottom:6px}
+
+/* ---------- Bottom nav ---------- */
+.nav{
+  position:fixed;bottom:0;inset-inline:0;background:var(--ink);z-index:30;
+  padding:8px 14px calc(8px + env(safe-area-inset-bottom));display:flex;gap:10px;justify-content:center;
+  border-top:var(--bw) solid var(--ink)
+}
+.nav button{
+  flex:1;max-width:220px;background:transparent;border:2px solid transparent;color:#fff;border-radius:12px;
+  padding:8px;font-weight:800;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:2px
+}
+.nav button span{font-size:22px}
+.nav button.on{background:var(--orange);color:var(--ink);border-color:var(--white)}
+.nav .buy{background:#25D366;color:var(--ink)}
+
+/* ---------- Modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(20,20,20,.65);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex}
+.sheet{
+  background:var(--paper);border:var(--bw) solid var(--ink);border-bottom:0;border-radius:24px 24px 0 0;
+  width:100%;max-width:640px;max-height:92vh;overflow-y:auto;padding:18px 18px calc(24px + env(safe-area-inset-bottom));
+  animation:up .22s ease-out
+}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.sheet{animation:none}}
+@media(min-width:700px){.overlay{align-items:center}.sheet{border-radius:24px;border-bottom:var(--bw) solid var(--ink)}}
+.sheet .x{float:inline-end}
+.sheet h2{font-family:'Cairo';font-weight:900;margin:0 0 12px;font-size:24px}
+.big-pic{border:var(--bw) solid var(--ink);border-radius:16px;overflow:hidden;background:var(--orange-l);aspect-ratio:4/3;display:grid;place-items:center;margin-bottom:12px}
+.big-pic img{width:100%;height:100%;object-fit:contain;background:#fff}
+.desc{white-space:pre-wrap;line-height:1.8;background:var(--white);border:2px solid var(--ink);border-radius:12px;padding:10px 12px;margin:10px 0 14px}
+
+/* ---------- Settings ---------- */
+.panel{background:var(--white);border:var(--bw) solid var(--ink);border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:18px}
+.panel h2{margin:0 0 10px;font-family:'Cairo';font-weight:900;font-size:21px;display:flex;align-items:center;gap:8px}
+.panel h2::before{content:"";width:12px;height:24px;background:var(--orange);border:2px solid var(--ink);border-radius:4px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:140px}
+.muted{opacity:.75;font-size:14px;line-height:1.7}
+
+/* ---------- Forms ---------- */
+label{display:block;font-weight:800;margin:10px 0 5px;font-size:14px}
+.in{width:100%;border:var(--bw) solid var(--ink);border-radius:12px;padding:11px 12px;background:var(--white);outline:0}
+.in:focus{box-shadow:3px 3px 0 var(--orange)}
+textarea.in{min-height:90px;resize:vertical}
+
+/* ---------- Admin ---------- */
+.tabs{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+.tabs button{flex:1;border:var(--bw) solid var(--ink);border-radius:12px;background:var(--white);padding:9px;font-weight:800}
+.tabs button.on{background:var(--orange)}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;gap:10px;align-items:center;background:var(--white);border:2px solid var(--ink);border-radius:14px;padding:8px}
+.item img,.item .th{width:56px;height:56px;border-radius:10px;border:2px solid var(--ink);object-fit:cover;flex:none;background:var(--orange-l);display:grid;place-items:center;font-size:24px}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .t small{opacity:.75}
+.img-prev{width:110px;height:110px;border:var(--bw) solid var(--ink);border-radius:14px;object-fit:cover;display:block;margin-top:8px;background:var(--orange-l)}
+.toast{
+  position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--orange);
+  border:2px solid var(--orange);padding:10px 20px;border-radius:99px;font-weight:800;z-index:99;display:none;max-width:90vw;text-align:center
+}
+.toast.show{display:block}
+.pin{letter-spacing:12px;text-align:center;font-size:26px;font-weight:800}
+.foot{text-align:center;font-size:13px;opacity:.7;margin-top:24px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo"><img src="data:image/png;base64,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" alt="شعار مكتب المهندس"></div>
+    <div>
+      <h1>مكتب المهندس</h1>
+      <small>أجهزة وسلع إلكترونية</small>
+    </div>
+    <div class="sync off" id="syncBadge"><i></i><span>محلي</span></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav">
+  <button id="nHome" class="on" onclick="go('home')"><span>🏠</span>الرئيسية</button>
+  <button class="buy" onclick="orderGeneral()"><span>💬</span>اطلب واتساب</button>
+  <button id="nSet" onclick="go('settings')"><span>⚙️</span>الإعدادات</button>
+</nav>
+
+<div class="overlay" id="ov"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   إعدادات التطبيق — عدّل هنا فقط
+   ===================================================================== */
+const SHOP_NAME      = "مكتب المهندس";
+const SHOP_WHATSAPP  = "07749610200";          // رقم الشراء (واتساب)
+const DEFAULT_MANAGER = "07700000000";          // رقم المدير (غيّره من لوحة المسؤول)
+const ADMIN_CODE     = "200957";                // رمز المسؤول
+const ADMIN_EMAIL    = "admin@mktab-almuhandis.com"; // بريد حساب المسؤول في Firebase (شوف الشرح)
+const CURRENCY       = "د.ع";
+
+/* ألصق هنا إعدادات Firebase بعد ما تسويها (شوف الشرح).
+   إذا خليته null التطبيق يشتغل محلياً بس على نفس الجهاز. */
+const FIREBASE_CONFIG = null;
+/* مثال:
+const FIREBASE_CONFIG = {
+  apiKey: "....",
+  authDomain: "....firebaseapp.com",
+  projectId: "....",
+  storageBucket: "....",
+  messagingSenderId: "....",
+  appId: "...."
+};
+*/
+/* ===================================================================== */
+
+const state = { cats:[], products:[], settings:{managerPhone:DEFAULT_MANAGER, address:"", about:""},
+                view:"home", cat:"all", q:"", isAdmin:false, tab:"cats" };
+let db=null, auth=null, cloud=false;
+
+/* ---------- أدوات ---------- */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n=>Number(n||0).toLocaleString('en');
+function intl(num){ // 0774... -> 964774...
+  let n=String(num).replace(/\D/g,"");
+  if(n.startsWith("00")) n=n.slice(2);
+  if(n.startsWith("0")) n="964"+n.slice(1);
+  return n;
+}
+function waLink(num,text){return `https://wa.me/${intl(num)}?text=${encodeURIComponent(text||"")}`}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2200)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+
+/* ---------- طبقة البيانات (أونلاين / محلي) ---------- */
+const LS="mm_store_v1";
+function loadLocal(){
+  try{const d=JSON.parse(localStorage.getItem(LS)||"null"); if(d){state.cats=d.cats||[];state.products=d.products||[];state.settings={...state.settings,...(d.settings||{})}}}catch(e){}
+}
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify({cats:state.cats,products:state.products,settings:state.settings}))}catch(e){toast("المساحة ممتلئة، صغّر الصور")}}
+
+async function initData(){
+  loadLocal();
+  if(FIREBASE_CONFIG && window.firebase){
+    try{
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db=firebase.firestore(); auth=firebase.auth(); cloud=true;
+      try{ db.enablePersistence({synchronizeTabs:true}).catch(()=>{}) }catch(e){}
+      db.collection("categories").orderBy("ts").onSnapshot(s=>{state.cats=s.docs.map(d=>({id:d.id,...d.data()}));saveLocal();render()});
+      db.collection("products").orderBy("ts","desc").onSnapshot(s=>{state.products=s.docs.map(d=>({id:d.id,...d.data()}));saveLocal();render()});
+      db.collection("settings").doc("main").onSnapshot(d=>{if(d.exists){state.settings={...state.settings,...d.data()};saveLocal();render()}});
+      auth.onAuthStateChanged(u=>{state.isAdmin=!!(u&&u.email===ADMIN_EMAIL)});
+      const b=$("#syncBadge");b.classList.remove("off");b.querySelector("span").textContent="أونلاين";
+    }catch(e){console.error(e);cloud=false;toast("تعذر الاتصال بـ Firebase، اشتغل محلياً")}
+  }
+}
+async function dbSaveCat(c){
+  if(cloud){const {id,...rest}=c;await db.collection("categories").doc(id).set(rest,{merge:true})}
+  else{const i=state.cats.findIndex(x=>x.id===c.id);i<0?state.cats.push(c):state.cats[i]=c;saveLocal();render()}
+}
+async function dbDelCat(id){
+  if(cloud){await db.collection("categories").doc(id).delete()}
+  else{state.cats=state.cats.filter(c=>c.id!==id);saveLocal();render()}
+}
+async function dbSaveProd(p){
+  if(cloud){const {id,...rest}=p;await db.collection("products").doc(id).set(rest,{merge:true})}
+  else{const i=state.products.findIndex(x=>x.id===p.id);i<0?state.products.unshift(p):state.products[i]=p;saveLocal();render()}
+}
+async function dbDelProd(id){
+  if(cloud){await db.collection("products").doc(id).delete()}
+  else{state.products=state.products.filter(p=>p.id!==id);saveLocal();render()}
+}
+async function dbSaveSettings(s){
+  if(cloud){await db.collection("settings").doc("main").set(s,{merge:true})}
+  else{state.settings={...state.settings,...s};saveLocal();render()}
+}
+
+/* ---------- التنقل ---------- */
+function go(v){
+  state.view=v;
+  $("#nHome").classList.toggle("on",v==="home");
+  $("#nSet").classList.toggle("on",v==="settings");
+  window.scrollTo({top:0});render();
+}
+function orderGeneral(){
+  window.open(waLink(SHOP_WHATSAPP,`السلام عليكم، أريد الاستفسار عن سلعة من ${SHOP_NAME}`),"_blank");
+}
+
+/* ---------- العرض ---------- */
+function render(){
+  const app=$("#app");
+  if(state.view==="settings"){app.innerHTML=settingsView()}
+  else app.innerHTML=homeView();
+  if(state.adminOpen) renderAdmin();
+}
+function homeView(){
+  const cats=state.cats;
+  let list=state.products.filter(p=>p.available!==false || true);
+  if(state.cat!=="all") list=list.filter(p=>p.catId===state.cat);
+  if(state.q.trim()) list=list.filter(p=>(p.name+" "+(p.desc||"")).toLowerCase().includes(state.q.trim().toLowerCase()));
+  return `
+  <div class="search"><span>🔍</span><input id="q" placeholder="ابحث عن سلعة..." value="${esc(state.q)}" oninput="state.q=this.value;renderGrid()"></div>
+  <div class="chips">
+    <button class="chip ${state.cat==="all"?"on":""}" onclick="setCat('all')">الكل</button>
+    ${cats.map(c=>`<button class="chip ${state.cat===c.id?"on":""}" onclick="setCat('${c.id}')">${esc(c.name)}</button>`).join("")}
+  </div>
+  <div id="gridBox">${gridHTML(list)}</div>`;
+}
+function setCat(id){state.cat=id;render()}
+function renderGrid(){
+  let list=state.products;
+  if(state.cat!=="all") list=list.filter(p=>p.catId===state.cat);
+  if(state.q.trim()) list=list.filter(p=>(p.name+" "+(p.desc||"")).toLowerCase().includes(state.q.trim().toLowerCase()));
+  $("#gridBox").innerHTML=gridHTML(list);
+}
+function gridHTML(list){
+  if(!list.length){
+    return `<div class="empty"><b>📦</b>${state.products.length?"ما لكينا سلعة بهذا البحث":"ماكو سلع بعد. المسؤول يكدر يضيفها من الإعدادات."}</div>`;
+  }
+  return `<div class="grid">${list.map(p=>{
+    const cat=state.cats.find(c=>c.id===p.catId);
+    return `<article class="card" onclick="openProduct('${p.id}')">
+      ${p.available===false?'<span class="tag">نفذت</span>':''}
+      <div class="pic">${p.img?`<img loading="lazy" src="${esc(p.img)}" alt="${esc(p.name)}">`:'<span class="ph">🔌</span>'}</div>
+      <div class="info">
+        <h3>${esc(p.name)}</h3>
+        <div class="price">${fmt(p.price)} <small>${CURRENCY}</small></div>
+        <a class="btn wa sm" href="${waLink(SHOP_WHATSAPP,`السلام عليكم، أريد شراء: ${p.name}\nالسعر: ${fmt(p.price)} ${CURRENCY}`)}" target="_blank" onclick="event.stopPropagation()">💬 اشتري واتساب</a>
+      </div>
+    </article>`}).join("")}</div>`;
+}
+function openProduct(id){
+  const p=state.products.find(x=>x.id===id); if(!p)return;
+  const cat=state.cats.find(c=>c.id===p.catId);
+  const msg=`السلام عليكم، أريد شراء: ${p.name}\nالسعر: ${fmt(p.price)} ${CURRENCY}`;
+  openSheet(`
+    <button class="btn white sm x" onclick="closeSheet()">✕ إغلاق</button>
+    <h2>${esc(p.name)}</h2>
+    <div class="big-pic">${p.img?`<img src="${esc(p.img)}" alt="">`:'<span style="font-size:70px">🔌</span>'}</div>
+    <div class="price" style="font-size:28px">${fmt(p.price)} <small>${CURRENCY}</small></div>
+    ${cat?`<div class="muted">القسم: ${esc(cat.name)}</div>`:""}
+    ${p.available===false?'<div class="muted" style="color:var(--red);font-weight:800">هذي السلعة نفذت حالياً — استفسر إذا راح ترجع</div>':""}
+    ${p.desc?`<div class="desc">${esc(p.desc)}</div>`:""}
+    <a class="btn wa block" href="${waLink(SHOP_WHATSAPP,msg)}" target="_blank">💬 اشتري عن طريق واتساب</a>
+  `);
+}
+function openSheet(html){ $("#sheet").innerHTML=html; $("#ov").classList.add("show"); }
+function closeSheet(){ $("#ov").classList.remove("show"); state.adminOpen=false; }
+$("#ov").addEventListener("click",e=>{if(e.target.id==="ov")closeSheet()});
+
+/* ---------- الإعدادات ---------- */
+function settingsView(){
+  const s=state.settings;
+  return `
+  <section class="panel">
+    <h2>الدعم والاستفسار</h2>
+    <p class="muted">للاستفسار أو الشكوى تواصل مع المدير مباشرة:</p>
+    <div class="row">
+      <a class="btn wa" href="${waLink(s.managerPhone,'السلام عليكم، أريد الاستفسار من المدير')}" target="_blank">💬 واتساب المدير</a>
+      <a class="btn dark" href="tel:${esc(s.managerPhone)}">📞 اتصال بالمدير</a>
+    </div>
+    <p style="font-weight:800;margin:12px 0 0;direction:ltr;text-align:right">${esc(s.managerPhone)}</p>
+  </section>
+
+  <section class="panel">
+    <h2>للشراء</h2>
+    <p class="muted">تريد تشتري سلعة؟ اضغط وراسلنا على واتساب:</p>
+    <a class="btn wa block" href="${waLink(SHOP_WHATSAPP,'السلام عليكم، أريد شراء سلعة')}" target="_blank">💬 ${esc(SHOP_WHATSAPP)}</a>
+  </section>
+
+  ${s.address?`<section class="panel"><h2>عنوان المحل</h2><p style="margin:0;line-height:1.8">${esc(s.address)}</p></section>`:""}
+
+  <section class="panel">
+    <h2>قسم المسؤول</h2>
+    <p class="muted">إضافة الأقسام والسلع وتعديلها — بالرمز السري فقط.</p>
+    <button class="btn dark block" onclick="askAdmin()">🔒 دخول المسؤول</button>
+  </section>
+  <div class="foot">${SHOP_NAME} © ${new Date().getFullYear()}</div>`;
+}
+
+/* ---------- دخول المسؤول ---------- */
+function askAdmin(){
+  if(state.isAdmin){openAdmin();return}
+  openSheet(`
+    <button class="btn white sm x" onclick="closeSheet()">✕</button>
+    <h2>🔒 دخول المسؤول</h2>
+    <p class="muted">اكتب الرمز السري:</p>
+    <input id="pin" class="in pin" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="••••••" onkeydown="if(event.key==='Enter')checkPin()">
+    <button class="btn block" style="margin-top:14px" onclick="checkPin()">دخول</button>`);
+  setTimeout(()=>$("#pin")&&$("#pin").focus(),100);
+}
+async function checkPin(){
+  const v=$("#pin").value.trim();
+  if(cloud){
+    try{await auth.signInWithEmailAndPassword(ADMIN_EMAIL,v);state.isAdmin=true;openAdmin();toast("أهلاً بيك يا مسؤول ✅")}
+    catch(e){toast("الرمز غلط ❌");$("#pin").value=""}
+  }else{
+    if(v===ADMIN_CODE){state.isAdmin=true;openAdmin();toast("أهلاً بيك يا مسؤول ✅")}
+    else{toast("الرمز غلط ❌");$("#pin").value=""}
+  }
+}
+async function adminLogout(){ if(cloud){try{await auth.signOut()}catch(e){}} state.isAdmin=false; closeSheet(); toast("تم تسجيل الخروج"); }
+
+/* ---------- لوحة المسؤول ---------- */
+let draftImg="";
+function openAdmin(){ state.adminOpen=true; state.tab=state.tab||"cats"; $("#ov").classList.add("show"); renderAdmin(); }
+function renderAdmin(){
+  if(!state.isAdmin){closeSheet();return}
+  const t=state.tab;
+  let body="";
+  if(t==="cats") body=adminCats();
+  else if(t==="prods") body=adminProds();
+  else body=adminSettings();
+  $("#sheet").innerHTML=`
+    <button class="btn white sm x" onclick="closeSheet()">✕ إغلاق</button>
+    <h2>لوحة المسؤول</h2>
+    <div class="tabs">
+      <button class="${t==="cats"?"on":""}" onclick="state.tab='cats';renderAdmin()">الأقسام</button>
+      <button class="${t==="prods"?"on":""}" onclick="state.tab='prods';draftImg='';renderAdmin()">السلع</button>
+      <button class="${t==="set"?"on":""}" onclick="state.tab='set';renderAdmin()">الإعدادات</button>
+    </div>
+    ${body}
+    <button class="btn red block" style="margin-top:18px" onclick="adminLogout()">تسجيل خروج</button>`;
+}
+
+/* الأقسام */
+function adminCats(){
+  return `
+    <label>اسم قسم جديد</label>
+    <div class="row" style="flex-wrap:nowrap">
+      <input id="catName" class="in" placeholder="مثال: هواتف، شواحن، كاميرات">
+      <button class="btn" style="flex:none;min-width:0" onclick="addCat()">إضافة</button>
+    </div>
+    <label style="margin-top:18px">الأقسام الحالية (${state.cats.length})</label>
+    <div class="list">
+    ${state.cats.length?state.cats.map(c=>`
+      <div class="item"><div class="th">📁</div>
+        <div class="t"><b>${esc(c.name)}</b><small>${state.products.filter(p=>p.catId===c.id).length} سلعة</small></div>
+        <button class="btn sm white" onclick="renameCat('${c.id}')">✏️</button>
+        <button class="btn sm red" onclick="delCat('${c.id}')">🗑</button>
+      </div>`).join(""):'<div class="empty">ماكو أقسام. أضف أول قسم.</div>'}
+    </div>`;
+}
+async function addCat(){
+  const n=$("#catName").value.trim(); if(!n)return toast("اكتب اسم القسم");
+  await dbSaveCat({id:uid(),name:n,ts:Date.now()}); toast("تمت إضافة القسم ✅");
+}
+async function renameCat(id){
+  const c=state.cats.find(x=>x.id===id); const n=prompt("الاسم الجديد:",c.name); if(!n||!n.trim())return;
+  await dbSaveCat({...c,name:n.trim()}); toast("تم التعديل ✅");
+}
+async function delCat(id){
+  const n=state.products.filter(p=>p.catId===id).length;
+  if(!confirm(n?`هذا القسم فيه ${n} سلعة، السلع راح تبقى بدون قسم. تحذف القسم؟`:"تحذف هذا القسم؟"))return;
+  await dbDelCat(id); if(state.cat===id)state.cat="all"; toast("تم الحذف");
+}
+
+/* السلع */
+function adminProds(){
+  return `
+    <button class="btn block" onclick="prodForm()">➕ إضافة سلعة جديدة</button>
+    <label style="margin-top:18px">السلع الحالية (${state.products.length})</label>
+    <div class="list">
+    ${state.products.length?state.products.map(p=>`
+      <div class="item">
+        ${p.img?`<img src="${esc(p.img)}" alt="">`:'<div class="th">🔌</div>'}
+        <div class="t"><b>${esc(p.name)}</b><small>${fmt(p.price)} ${CURRENCY}${p.available===false?" — نفذت":""}</small></div>
+        <button class="btn sm white" onclick="prodForm('${p.id}')">✏️</button>
+        <button class="btn sm red" onclick="delProd('${p.id}')">🗑</button>
+      </div>`).join(""):'<div class="empty">ماكو سلع. اضغط إضافة سلعة.</div>'}
+    </div>`;
+}
+function prodForm(id){
+  if(!state.cats.length){toast("أضف قسم أول شي");state.tab="cats";renderAdmin();return}
+  const p=id?state.products.find(x=>x.id===id):{name:"",price:"",catId:state.cats[0].id,desc:"",img:"",available:true};
+  draftImg=p.img||"";
+  $("#sheet").innerHTML=`
+    <button class="btn white sm x" onclick="renderAdmin()">↩ رجوع</button>
+    <h2>${id?"تعديل سلعة":"سلعة جديدة"}</h2>
+    <label>اسم السلعة</label><input id="pName" class="in" value="${esc(p.name)}">
+    <div class="row">
+      <div><label>السعر (${CURRENCY})</label><input id="pPrice" class="in" inputmode="numeric" value="${esc(p.price)}"></div>
+      <div><label>القسم</label><select id="pCat" class="in">${state.cats.map(c=>`<option value="${c.id}" ${c.id===p.catId?"selected":""}>${esc(c.name)}</option>`).join("")}</select></div>
+    </div>
+    <label>الوصف (اختياري)</label><textarea id="pDesc" class="in">${esc(p.desc||"")}</textarea>
+    <label>الصورة</label>
+    <input id="pFile" type="file" accept="image/*" class="in" onchange="pickImg(this)">
+    <img id="pPrev" class="img-prev" style="${draftImg?"":"display:none"}" src="${esc(draftImg)}" alt="">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:14px"><input id="pAv" type="checkbox" ${p.available!==false?"checked":""} style="width:22px;height:22px"> متوفرة</label>
+    <button class="btn block" style="margin-top:16px" onclick="saveProd('${id||""}')">💾 حفظ</button>`;
+}
+function pickImg(inp){
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const im=new Image();
+    im.onload=()=>{
+      const M=720, k=Math.min(1,M/Math.max(im.width,im.height));
+      const c=document.createElement("canvas"); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k);
+      const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height); x.drawImage(im,0,0,c.width,c.height);
+      draftImg=c.toDataURL("image/jpeg",0.72);
+      const pv=$("#pPrev"); pv.src=draftImg; pv.style.display="block";
+    };
+    im.src=e.target.result;
+  };
+  r.readAsDataURL(f);
+}
+async function saveProd(id){
+  const name=$("#pName").value.trim(), price=Number($("#pPrice").value.replace(/[^\d.]/g,""));
+  if(!name)return toast("اكتب اسم السلعة");
+  if(!price&&price!==0)return toast("اكتب السعر");
+  const old=id?state.products.find(x=>x.id===id):null;
+  const p={id:id||uid(),name,price,catId:$("#pCat").value,desc:$("#pDesc").value.trim(),img:draftImg||"",available:$("#pAv").checked,ts:old?old.ts:Date.now()};
+  try{await dbSaveProd(p);toast("تم الحفظ ✅");renderAdmin()}catch(e){console.error(e);toast("فشل الحفظ: "+(e.code||"خطأ"))}
+}
+async function delProd(id){ if(!confirm("تحذف هذي السلعة؟"))return; await dbDelProd(id); toast("تم الحذف"); }
+
+/* إعدادات المسؤول */
+function adminSettings(){
+  const s=state.settings;
+  return `
+    <label>رقم المدير (يظهر في قسم الدعم)</label>
+    <input id="sMgr" class="in" inputmode="tel" style="direction:ltr;text-align:right" value="${esc(s.managerPhone)}">
+    <label>عنوان المحل (اختياري)</label>
+    <input id="sAddr" class="in" value="${esc(s.address||"")}" placeholder="مثال: بغداد - الكرادة">
+    <button class="btn block" style="margin-top:16px" onclick="saveSet()">💾 حفظ</button>
+    <p class="muted" style="margin-top:14px">رقم الشراء ثابت: <b style="direction:ltr;display:inline-block">${esc(SHOP_WHATSAPP)}</b></p>`;
+}
+async function saveSet(){
+  const m=$("#sMgr").value.trim(); if(!m)return toast("اكتب رقم المدير");
+  await dbSaveSettings({managerPhone:m,address:$("#sAddr").value.trim()}); toast("تم الحفظ ✅");
+}
+
+/* ---------- PWA بسيط (يشتغل كتطبيق على الموبايل) ---------- */
+(function(){
+  const manifest={name:SHOP_NAME,short_name:SHOP_NAME,start_url:".",display:"standalone",background_color:"#FF7A00",theme_color:"#FF7A00",lang:"ar",dir:"rtl",
+    icons:[{src:"data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#FF7A00"/><rect x="40" y="40" width="432" height="432" rx="90" fill="#141414"/><text x="256" y="350" font-size="300" font-weight="900" text-anchor="middle" fill="#FF7A00" font-family="Arial">م</text></svg>'),sizes:"512x512",type:"image/svg+xml"}]};
+  try{const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"}));document.head.appendChild(l)}catch(e){}
+})();
+// نهاية دالة الـ PWA
+  })();
+
+/* ---------- ربط السيرفر أونلاين (Firebase Firestore) ---------- */
+
+async function initData() {
+  db.collection("cats").onSnapshot((snapshot) => {
+    state.cats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    render();
+  });
+
+  db.collection("prods").onSnapshot((snapshot) => {
+    state.products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    render();
+  });
+
+  db.collection("settings").doc("main").onSnapshot((doc) => {
+    if (doc.exists) {
+      state.settings = doc.data();
+      render();
+    }
+  });
+}
+
+async function dbSaveProd(prod) {
+  const id = prod.id || db.collection("prods").doc().id;
+  prod.id = id;
+  await db.collection("prods").doc(id).set(prod);
+}
+
+async function dbDelProd(id) {
+  await db.collection("prods").doc(id).delete();
+}
+
+async function dbSaveCat(cat) {
+  const id = cat.id || db.collection("cats").doc().id;
+  cat.id = id;
+  await db.collection("cats").doc(id).set(cat);
+}
+
+async function dbDelCat(id) {
+  await db.collection("cats").doc(id).delete();
+}
+
+async function dbSaveSettings(settings) {
+  await db.collection("settings").doc("main").set(settings, { merge: true });
+}
+
+/* ---------- تشغيل ---------- */
+initData().then(render);
+render();
+</script>
+</body>
+</html>
