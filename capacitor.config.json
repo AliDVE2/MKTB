@@ -1,0 +1,7 @@
+{
+  "appId": "com.mktab.store",
+  "appName": "مكتب المهندس",
+  "webDir": "public",
+  "backgroundColor": "#0a0a0b",
+  "android": { "allowMixedContent": false }
+}
