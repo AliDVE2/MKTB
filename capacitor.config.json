@@ -1,0 +1,16 @@
+{
+  "appId": "com.mktab.store",
+  "appName": "مكتب المهندس",
+  "webDir": "public",
+  "backgroundColor": "#0a0a0b",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#0a0a0b",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
+    }
+  }
+}
